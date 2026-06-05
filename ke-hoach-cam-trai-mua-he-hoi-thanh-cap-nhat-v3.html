@@ -11,6 +11,10 @@
   <script>window.IMG_DATA = {};</script>
   <script src="images_manifest.js"></script>
 
+  <!-- Firebase Realtime Database SDK (for real-time voting) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
   <style>
     :root{
       --ink:#17201a;--muted:#5b675d;--paper:#fbfaf6;--panel:#fff;
@@ -125,6 +129,78 @@
     /* Source badge – hidden on public website */
     .src-badge{ display:none }
 
+    /* ── Voting ─────────────────────────────────────────────────── */
+    .vote-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
+    .vcard{
+      border:2px solid var(--line);border-radius:14px;padding:20px 18px;
+      background:#fff;position:relative;overflow:hidden;
+      transition:border-color .2s,box-shadow .2s,transform .15s;
+    }
+    .vcard:not(.vcard--done){cursor:pointer}
+    .vcard:not(.vcard--done):hover{
+      border-color:var(--sky);
+      box-shadow:0 8px 24px rgba(53,107,140,.15);
+      transform:translateY(-3px)
+    }
+    .vcard--voted{
+      border-color:#3a9e50!important;
+      background:linear-gradient(135deg,#f0faf0,#fff);
+      box-shadow:0 8px 24px rgba(58,158,80,.18)!important
+    }
+    .vcrown{
+      position:absolute;top:10px;right:12px;
+      font-size:1.5rem;opacity:0;
+      transition:opacity .4s,transform .4s;
+      transform:scale(.5)
+    }
+    .vcard--winner .vcrown{opacity:1;transform:scale(1)}
+    .vemoji{font-size:2.4rem;display:block;margin-bottom:10px;line-height:1}
+    .vname{font-weight:850;font-size:1.07rem;margin-bottom:3px;color:var(--ink)}
+    .vsub{color:var(--muted);font-size:.83rem;margin-bottom:14px}
+    .vcount-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+    .vcount{
+      font-size:2.2rem;font-weight:900;color:var(--sky);line-height:1;
+      transition:color .3s
+    }
+    .vcard--voted .vcount{color:#2d7e40}
+    .vpct{color:var(--muted);font-size:.9rem;font-weight:700}
+    .vbar-wrap{background:var(--soft);border-radius:999px;height:9px;overflow:hidden;margin-bottom:12px}
+    .vbar{
+      height:100%;border-radius:999px;
+      background:linear-gradient(90deg,var(--sky),#2a7fbf);
+      transition:width .7s cubic-bezier(.4,0,.2,1)
+    }
+    .vcard--voted .vbar{background:linear-gradient(90deg,#2d8a3e,#3aaa50)}
+    .vbtn{
+      width:100%;padding:11px;border:none;border-radius:9px;
+      background:var(--sky);color:#fff;
+      font-weight:800;font-size:.95rem;cursor:pointer;
+      transition:background .15s,transform .1s,opacity .2s;
+      letter-spacing:.01em
+    }
+    .vbtn:not(:disabled):hover{background:#2a5972;transform:scale(1.02)}
+    .vbtn:disabled{opacity:.65;cursor:not-allowed}
+    .vbtn--my{background:linear-gradient(90deg,#1a7a30,#2fa84a)!important;opacity:1!important;cursor:default!important}
+    .vote-note{
+      margin:14px 0 0;font-size:.82rem;color:var(--muted);
+      display:flex;align-items:center;gap:6px
+    }
+    .vote-note::before{content:'🔒';font-size:.9rem}
+    .vote-setup-box{
+      background:var(--warn);border:1px solid var(--gold);border-radius:8px;
+      padding:14px 16px;font-size:.9rem;line-height:1.7;margin-bottom:14px
+    }
+    .vote-setup-box code{
+      background:#f0e8cc;padding:2px 6px;border-radius:4px;
+      font-family:monospace;font-size:.88em
+    }
+    #vote-badge{
+      display:inline-block;background:var(--sky);color:#fff;
+      border-radius:999px;padding:3px 13px;
+      font-size:.78rem;font-weight:800;vertical-align:middle;margin-left:8px
+    }
+    @media(max-width:680px){.vote-grid{grid-template-columns:1fr}}
+
     @media(max-width:920px){
       header{padding:34px 22px}
       .cards,.two-col,.routebar{grid-template-columns:1fr}
@@ -165,6 +241,28 @@
     </div>
     <div class="recommend"><strong>Về âm nhạc:</strong> nếu cần sinh hoạt âm nhạc lớn, nên chọn bãi dispersed/primitive hợp pháp và tự lo toilet di động, nước, rác, fire restrictions.</div>
   </section>
+
+  <!-- ═══════════════ VOTING SECTION ═══════════════ -->
+  <section class="sec-pad" id="vote-section">
+    <h2>🗳️ Bình chọn phương án
+      <span id="vote-badge">0 phiếu</span>
+    </h2>
+    <p style="color:var(--muted);margin:4px 0 16px;font-size:.93rem">
+      Mỗi thiết bị chỉ bình chọn được <strong>1 lần</strong> · Kết quả cập nhật theo thời gian thực cho mọi người.
+    </p>
+
+    <div id="vote-setup-notice" class="vote-setup-box" style="display:none">
+      <strong>⚙️ Cần điền Firebase config để bật bình chọn.</strong><br>
+      Trong file HTML, tìm <code>FIREBASE_CONFIG</code> và điền thông tin từ
+      <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a>.<br>
+      Xem hướng dẫn chi tiết bên dưới trang.
+    </div>
+
+    <div class="vote-grid" id="vote-grid"></div>
+
+    <p class="vote-note">Kết quả lưu trên Firebase · không thể bình chọn lại sau khi đã chọn trên thiết bị này</p>
+  </section>
+  <!-- ════════════════════════════════════════════ -->
 
   <div id="plans"></div>
 
@@ -464,6 +562,140 @@ galJobs.forEach(({id, def})=>{
     .then(({imgs, source})=> renderImages(el, imgs, source))
     .catch(()=>{ el.innerHTML='<div class="gal-empty">Lỗi khi tải ảnh.</div>'; });
 });
+
+// ═══════════════════════════════════════════════════════════════════
+//  VOTING SYSTEM  –  Firebase Realtime Database + localStorage
+// ═══════════════════════════════════════════════════════════════════
+//
+//  HƯỚNG DẪN CẤU HÌNH FIREBASE (làm 1 lần, ~5 phút):
+//  1. Vào https://console.firebase.google.com → "Add project"
+//  2. Đặt tên project → Disable Google Analytics → Create project
+//  3. Nhấn "</> Web" → đặt tên app → Register app → copy firebaseConfig
+//  4. Vào Build → Realtime Database → Create database
+//     → Chọn "Start in test mode" → Enable
+//  5. Paste config vào FIREBASE_CONFIG bên dưới
+//  6. git add . && git commit -m "Add voting" && git push
+// ═══════════════════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey:            'YOUR_API_KEY',
+  authDomain:        'YOUR_PROJECT.firebaseapp.com',
+  databaseURL:       'https://YOUR_PROJECT-default-rtdb.firebaseio.com',
+  projectId:         'YOUR_PROJECT_ID',
+  storageBucket:     'YOUR_PROJECT.appspot.com',
+  messagingSenderId: 'YOUR_SENDER_ID',
+  appId:             'YOUR_APP_ID'
+};
+// ═══════════════════════════════════════════════════════════════════
+
+const VOTE_PLANS = [
+  { key:'zion',        emoji:'🏔️', name:'Zion National Park',          sub:'Utah · 5 ngày 4 đêm · xa nhất' },
+  { key:'flagstaff',   emoji:'🌲', name:'Flagstaff – Sedona',           sub:'Arizona · 4 ngày 3 đêm · cân bằng' },
+  { key:'cloudcroft',  emoji:'⛺', name:'Cloudcroft, New Mexico',       sub:'NM · 4 ngày 3 đêm · mát & rừng cao' },
+  { key:'jemez',       emoji:'🏞️', name:'Jemez – Valles – Bandelier',  sub:'NM · 3 ngày 2 đêm · gần nhất' },
+];
+
+const VOTE_LS_KEY = 'agape_vote_2026';
+let myVote = localStorage.getItem(VOTE_LS_KEY);
+let voteDb  = null;
+
+function voteIsConfigured(){
+  return FIREBASE_CONFIG.databaseURL && !FIREBASE_CONFIG.databaseURL.includes('YOUR_');
+}
+
+function buildVoteGrid(){
+  return VOTE_PLANS.map(p => {
+    const voted   = !!myVote;
+    const isMine  = myVote === p.key;
+    const cardCls = ['vcard', voted?'vcard--done':'', isMine?'vcard--voted':''].join(' ');
+    const btnTxt  = isMine ? '✓ Đã bình chọn' : 'Bình chọn';
+    const btnCls  = 'vbtn' + (isMine?' vbtn--my':'');
+    return `<div class="${cardCls}" id="vc-${p.key}">
+  <span class="vcrown">👑</span>
+  <span class="vemoji">${p.emoji}</span>
+  <div class="vname">${p.name}</div>
+  <div class="vsub">${p.sub}</div>
+  <div class="vcount-row">
+    <div class="vcount" id="vn-${p.key}">–</div>
+    <div class="vpct"  id="vp-${p.key}"></div>
+  </div>
+  <div class="vbar-wrap"><div class="vbar" id="vb-${p.key}" style="width:0"></div></div>
+  <button class="${btnCls}" id="vbtn-${p.key}" ${voted?'disabled':''}
+    onclick="castVote('${p.key}')">${btnTxt}</button>
+</div>`;
+  }).join('');
+}
+
+function applyVoteCounts(data){
+  const total = VOTE_PLANS.reduce((s,p)=>s+(data[p.key]||0),0);
+  const maxV  = Math.max(...VOTE_PLANS.map(p=>data[p.key]||0), 1);
+  const badge = document.getElementById('vote-badge');
+  if(badge) badge.textContent = total + ' phiếu';
+  VOTE_PLANS.forEach(p=>{
+    const n   = data[p.key]||0;
+    const pct = total>0 ? Math.round(n/total*100) : 0;
+    const win = n===maxV && total>0;
+    const numEl  = document.getElementById(`vn-${p.key}`);
+    const pctEl  = document.getElementById(`vp-${p.key}`);
+    const barEl  = document.getElementById(`vb-${p.key}`);
+    const card   = document.getElementById(`vc-${p.key}`);
+    if(numEl) numEl.textContent = n;
+    if(pctEl) pctEl.textContent = total>0 ? pct+'%' : '';
+    if(barEl) barEl.style.width  = pct+'%';
+    if(card)  card.classList.toggle('vcard--winner', win);
+  });
+}
+
+function castVote(planKey){
+  if(myVote || !voteDb) return;
+  // Atomic increment (safe for concurrent votes)
+  voteDb.ref(`votes_2026/${planKey}`).transaction(v=>(v||0)+1);
+  // Lock locally
+  myVote = planKey;
+  localStorage.setItem(VOTE_LS_KEY, planKey);
+  // Update UI immediately
+  VOTE_PLANS.forEach(p=>{
+    const btn  = document.getElementById(`vbtn-${p.key}`);
+    const card = document.getElementById(`vc-${p.key}`);
+    if(btn)  { btn.disabled=true; }
+    if(card) { card.classList.add('vcard--done'); }
+    if(p.key===planKey){
+      if(btn)  { btn.textContent='✓ Đã bình chọn'; btn.classList.add('vbtn--my'); }
+      if(card) { card.classList.add('vcard--voted'); }
+    }
+  });
+  // Gentle scroll to voted card
+  const el = document.getElementById(`vc-${planKey}`);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function initVoting(){
+  const grid   = document.getElementById('vote-grid');
+  const notice = document.getElementById('vote-setup-notice');
+  if(!grid) return;
+
+  grid.innerHTML = buildVoteGrid();
+
+  if(!voteIsConfigured()){
+    if(notice) notice.style.display='block';
+    // Show zeros, voting disabled (buttons already disabled without Firebase)
+    VOTE_PLANS.forEach(p=>{
+      const n=document.getElementById(`vn-${p.key}`);
+      if(n) n.textContent='?';
+    });
+    return;
+  }
+
+  // Init Firebase
+  if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  voteDb = firebase.database();
+
+  // Real-time listener
+  voteDb.ref('votes_2026').on('value', snap=>{
+    applyVoteCounts(snap.val()||{});
+  });
+}
+
+initVoting();
 </script>
 </body>
 </html>
