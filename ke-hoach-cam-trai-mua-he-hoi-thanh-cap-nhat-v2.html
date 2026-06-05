@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kế hoạch cắm trại mùa hè – Hội thánh Albuquerque</title>
+  <meta name="description" content="Kế hoạch cắm trại mùa hè cho hội thánh Albuquerque: Zion, Flagstaff-Sedona, Cloudcroft, Jemez – ảnh thực tế từ Wikimedia Commons API.">
+  <style>
+    :root{--ink:#17201a;--muted:#5b675d;--paper:#fbfaf6;--panel:#fff;--line:#d7ded4;--soft:#eef3ed;--clay:#b35f3f;--sky:#356b8c;--gold:#ba8a25;--warn:#fff4d8}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper);line-height:1.55}
+    header{min-height:72vh;display:grid;align-items:end;padding:44px 7vw;color:#fff;
+      background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.70)),
+      url("https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Valles_Caldera_National_Preserve.jpg/1280px-Valles_Caldera_National_Preserve.jpg")
+      center/cover no-repeat}
+    h1{font-size:clamp(2.1rem,6.5vw,5.2rem);line-height:.96;margin:0 0 14px;letter-spacing:-.01em}
+    h2,h3,h4{letter-spacing:0}
+    h2{margin:0;font-size:clamp(1.3rem,2.2vw,2rem)}
+    h3{margin:24px 0 10px;font-size:1.12rem}
+    h4{margin:0 0 8px;color:var(--sky);font-size:1rem}
+    .hero{max-width:960px;text-shadow:0 2px 18px rgba(0,0,0,.35)}
+    .subtitle{font-size:clamp(.95rem,1.5vw,1.22rem);max-width:800px;margin:0 0 22px}
+    .chips{display:flex;gap:10px;flex-wrap:wrap}
+    .chip{border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.15);border-radius:999px;padding:7px 13px;font-weight:700;backdrop-filter:blur(8px);font-size:.9rem}
+    main{padding:36px 7vw 70px}
+    .wrap{max-width:1260px;margin:0 auto;display:grid;gap:18px}
+    section,details{background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(20,36,24,.07)}
+    .sec-pad{padding:24px}
+    .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:18px}
+    .mini{background:var(--soft);border-radius:8px;padding:15px;min-height:128px}
+    .mini strong{display:block;color:var(--sky);margin-bottom:6px}
+    .recommend{background:var(--warn);border-left:5px solid var(--gold);padding:14px 16px;border-radius:8px;margin-top:16px}
+    summary{list-style:none;cursor:pointer;padding:22px 24px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+    summary::-webkit-details-marker{display:none}
+    .caret{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--soft);font-weight:900;font-size:1.1rem;transition:transform .22s}
+    details[open] .caret{transform:rotate(45deg)}
+    .meta{color:var(--muted);margin:6px 0 0;font-size:.95rem}
+    .content{padding:0 24px 28px}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .box{background:#fbfcfa;border:1px solid var(--line);border-radius:8px;padding:16px}
+    .routebar{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+    .map-frame{width:100%;height:260px;border:0;border-radius:8px;background:#e7ebe4}
+    .route-links a{display:inline-block;margin:5px 8px 5px 0;padding:8px 11px;border-radius:999px;background:#e9efe7;color:#245b43;text-decoration:none;font-weight:700;font-size:.9rem}
+    .route-links a:hover{background:#d4e9d0}
+    .day{border-top:1px solid var(--line);padding:20px 0;display:grid;grid-template-columns:150px 1fr;gap:18px}
+    .day:first-of-type{border-top:0}
+    .date{font-weight:850;color:var(--clay);font-size:.95rem;padding-top:2px}
+    .attractions{display:grid;gap:16px;margin-top:14px}
+    .place{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdfb}
+
+    /* ── Dynamic gallery: auto-fill columns, variable image count ── */
+    .gallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(162px,1fr));
+      gap:9px;
+      margin-top:10px;
+      min-height:48px
+    }
+    .gal-spin{
+      display:flex;align-items:center;gap:9px;
+      color:var(--muted);font-size:.87rem;
+      padding:12px 0;grid-column:1/-1
+    }
+    .gal-spin::before{
+      content:'';width:15px;height:15px;flex-shrink:0;
+      border:2.5px solid #6f8b6d;border-top-color:transparent;
+      border-radius:50%;animation:spin .7s linear infinite
+    }
+    .gal-empty{color:var(--muted);font-size:.84rem;font-style:italic;padding:10px 0;grid-column:1/-1}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    figure{margin:0;background:#edf0eb;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+    figure img{width:100%;height:130px;object-fit:cover;display:block;background:#e0e5de}
+    figcaption{padding:5px 7px;color:var(--muted);font-size:.71rem;line-height:1.35;min-height:28px}
+
+    table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.94rem}
+    th,td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:top}
+    th{color:var(--sky);background:#f3f6f2;font-weight:700}
+    footer{max-width:1260px;margin:24px auto 0;color:var(--muted);font-size:.88rem;padding:0 0 8px}
+
+    @media(max-width:920px){
+      header{padding:34px 22px}
+      .cards,.two-col,.routebar{grid-template-columns:1fr}
+      .day{grid-template-columns:1fr}
+      .gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+      main{padding:24px 16px 54px}
+      summary{grid-template-columns:1fr}
+      .caret{justify-self:start}
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hero">
+    <h1>Kế hoạch cắm trại mùa hè</h1>
+    <p class="subtitle">Bốn phương án xuất phát từ Albuquerque · ảnh tải trực tiếp từ Wikimedia Commons API – luôn chính xác, số lượng ảnh phù hợp từng địa điểm.</p>
+    <div class="chips">
+      <span class="chip">Tháng 6–8</span>
+      <span class="chip">Đi ô tô</span>
+      <span class="chip">Nhóm lớn</span>
+      <span class="chip">Lều riêng</span>
+      <span class="chip">Ảnh API thực tế</span>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <section class="sec-pad">
+    <h2>Xếp hạng đề xuất mới</h2>
+    <div class="cards">
+      <div class="mini"><strong>1. Zion National Park</strong>Đẹp nhất nhưng xa, nóng và đông. Phù hợp chuyến retreat lớn 5 ngày 4 đêm.</div>
+      <div class="mini"><strong>2. Flagstaff – Sedona</strong>Cân bằng tốt: lái xe vừa, cảnh đẹp, rừng mát, hoạt động đa dạng. 4 ngày 3 đêm.</div>
+      <div class="mini"><strong>3. Cloudcroft</strong>Phương án NM mạnh: mát, rừng cao, group area ~90 người, gần White Sands. 4 ngày 3 đêm.</div>
+      <div class="mini"><strong>4. Jemez – Valles – Bandelier</strong>Gần nhất, tiết kiệm; xếp sau vì hội thánh đã đi Jemez nhiều. 3 ngày 2 đêm.</div>
+    </div>
+    <div class="recommend"><strong>Về âm nhạc:</strong> nếu cần sinh hoạt âm nhạc lớn hơn mức campground cho phép, nên chọn bãi dispersed/primitive hợp pháp và tự lo toilet di động, nước, rác, fire restrictions.</div>
+  </section>
+
+  <div id="plans"></div>
+
+  <section class="sec-pad">
+    <h2>So sánh nhanh</h2>
+    <table>
+      <thead><tr><th>Tiêu chí</th><th>Zion</th><th>Flagstaff-Sedona</th><th>Cloudcroft</th><th>Jemez</th></tr></thead>
+      <tbody>
+        <tr><td>Thời lượng tối ưu</td><td>5 ngày 4 đêm</td><td>4 ngày 3 đêm</td><td>4 ngày 3 đêm</td><td>3 ngày 2 đêm</td></tr>
+        <tr><td>Độ xa từ Albuquerque</td><td>Rất xa (~7-8 giờ)</td><td>Vừa (~4-5 giờ)</td><td>Vừa (~3.5-4.5 giờ)</td><td>Gần nhất (~1.5-2 giờ)</td></tr>
+        <tr><td>Phù hợp nhóm lớn</td><td>Tốt nếu đặt Watchman/South group</td><td>Tốt nếu đặt Dairy Springs group</td><td>Rất tốt – Slide Group Area</td><td>Tốt nếu nhóm nhỏ-vừa</td></tr>
+        <tr><td>Âm nhạc</td><td>Hạn chế nhất</td><td>Dairy Springs cấm amplified music/PA</td><td>Tốt hơn, nhất là group area/dispersed</td><td>Khá linh hoạt nếu dispersed hợp pháp</td></tr>
+        <tr><td>Nhà vệ sinh</td><td>Developed campground có restroom</td><td>Group/developed có vault toilet/nước tùy nơi</td><td>Slide Group có restroom/trash; dispersed tự lo</td><td>Jemez Falls có vault toilet; dispersed tự lo</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</div><!-- .wrap -->
+<footer>
+  <p><strong>Nguồn ảnh:</strong> Wikimedia Commons (API động – thumbnail URL thật, không đoán filename). <strong>Thông tin địa điểm:</strong> NPS, Recreation.gov, USFS Coconino/Santa Fe/Lincoln, BLM Utah. Kiểm tra lại alerts, fire restrictions, MVUM, nước và tình trạng đường trước khi đi.</p>
+</footer>
+</main>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  Wikimedia Commons API – dynamic image loader
+//  Sử dụng API thực tế, không đoán filename → không bao giờ bị 404
+// ════════════════════════════════════════════════════════════════
+const WM  = 'https://commons.wikimedia.org/w/api.php';
+const TW  = 520; // thumbnail width (px)
+const OK  = new Set(['image/jpeg','image/png','image/webp']);
+
+function isImg(pg) {
+  const ii = pg.imageinfo?.[0];
+  return ii && ii.thumburl && OK.has(ii.mime);
+}
+
+function toCard(pg) {
+  const ii = pg.imageinfo[0];
+  return {
+    src: ii.thumburl,
+    cap: pg.title.replace(/^File:/,'').replace(/_/g,' ').replace(/\.[^.]+$/,'').slice(0, 58)
+  };
+}
+
+async function wikiQ(params) {
+  const p = new URLSearchParams({
+    ...params,
+    prop: 'imageinfo',
+    iiprop: 'url|mime',
+    iiurlwidth: String(TW),
+    format: 'json',
+    origin: '*'
+  });
+  try {
+    const r = await fetch(`${WM}?${p}`);
+    const d = await r.json();
+    return Object.values(d.query?.pages || {});
+  } catch { return []; }
+}
+
+// Lấy ảnh từ một Category Wikimedia Commons
+async function fromCat(cat, maxN) {
+  const pages = await wikiQ({
+    action: 'query',
+    generator: 'categorymembers',
+    gcmtitle: `Category:${cat}`,
+    gcmtype: 'file',
+    gcmlimit: String(Math.min(maxN * 3, 50))
+  });
+  return pages.filter(isImg).slice(0, maxN).map(toCard);
+}
+
+// Lấy ảnh từ full-text search (trả về files khớp tên/mô tả)
+async function fromSearch(q, maxN) {
+  const pages = await wikiQ({
+    action: 'query',
+    generator: 'search',
+    gsrnamespace: '6',
+    gsrsearch: q,
+    gsrlimit: String(Math.min(maxN * 5, 50))
+  });
+  return pages.filter(isImg).slice(0, maxN).map(toCard);
+}
+
+// Kết hợp: thử category trước, fallback sang search nếu chưa đủ ảnh
+async function loadImages(def) {
+  let imgs = [];
+  if (def.cat) {
+    imgs = await fromCat(def.cat, def.max);
+  }
+  const need = Math.max(1, Math.ceil(def.max * 0.5));
+  if (imgs.length < need && def.q) {
+    const extra = await fromSearch(def.q, def.max);
+    const seen  = new Set(imgs.map(i => i.src));
+    imgs = [...imgs, ...extra.filter(i => !seen.has(i.src))].slice(0, def.max);
+  }
+  return imgs;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  Dữ liệu các phương án – mỗi place có: name, cat?, q?, max
+//  cat  = tên Category Wikimedia Commons (không có tiền tố "Category:")
+//  q    = từ khóa tìm kiếm (fallback / bổ sung)
+//  max  = số ảnh tối đa muốn hiển thị cho địa điểm đó
+// ════════════════════════════════════════════════════════════════
+const plans = [
+  // ────────────────────────────────────────────────────────────
+  {
+    title: 'Phương án 1: Zion National Park, Utah',
+    meta:  'Tối ưu 5 ngày 4 đêm. Tốt nhất cuối tháng 6 hoặc cuối tháng 8; tránh giữa tháng 7 nếu nhóm không chịu nóng tốt.',
+    dst:   'Zion National Park, UT',
+    wp:    'Gallup, NM|Flagstaff, AZ|Page, AZ|Kanab, UT',
+    mapQ:  'Zion National Park Watchman Campground',
+    camp:  'Ưu tiên Watchman/South group sites nếu đặt được. Nếu cần âm thanh thoải mái hơn, chỉ xét BLM/USFS ngoài park và phải tự lo toilet/nước/rác.',
+    drive: 'Nghỉ Gallup, Flagstaff, Page/Kanab. Không xếp tham quan ngày đi và ngày về.',
+    days: [
+      { date:'Ngày 1', title:'Albuquerque → Zion',
+        notes:['06:00 xuất phát; nghỉ Gallup và Flagstaff; đến campground trước tối.','Dựng trại, ăn tối đơn giản, họp nhóm ngắn.'],
+        places:[] },
+
+      { date:'Ngày 2', title:'Zion Canyon nhẹ-vừa',
+        notes:['Sáng Riverside Walk / The Narrows entrance.','Chiều Emerald Pools; tối sinh hoạt acoustic.'],
+        places:[
+          { name:'The Narrows – Riverside Walk',
+            cat:'The_Narrows_(Zion_National_Park)',
+            q:'The Narrows Zion National Park river canyon hike Utah',
+            max:7 },
+          { name:'Emerald Pools',
+            cat:'Emerald_Pools_(Zion_National_Park)',
+            q:'Emerald Pools Zion National Park waterfall trail',
+            max:5 },
+        ]},
+
+      { date:'Ngày 3', title:'Viewpoints',
+        notes:["Sáng Canyon Overlook sau đường hầm.","Chiều Watchman Trail hoặc Pa'rus Trail."],
+        places:[
+          { name:'Canyon Overlook Trail',
+            q:'Canyon Overlook Trail Zion National Park view Utah',
+            max:5 },
+          { name:"Angels Landing – Pa'rus Trail",
+            cat:'Angels_Landing',
+            q:"Angels Landing Zion National Park Utah summit viewpoint",
+            max:5 },
+        ]},
+
+      { date:'Ngày 4', title:'Kolob Canyons / East Zion',
+        notes:["Kolob Canyons Scenic Drive + Timber Creek Overlook.","Nếu nhóm mệt, thay bằng museum + Pa'rus sunset walk."],
+        places:[
+          { name:'Kolob Canyons',
+            cat:'Kolob_Canyons',
+            q:'Kolob Canyons Zion National Park red cliffs Utah canyon',
+            max:6 },
+          { name:'East Zion – Checkerboard Mesa',
+            q:'Checkerboard Mesa East Zion sandstone canyon Utah',
+            max:4 },
+        ]},
+
+      { date:'Ngày 5', title:'Về Albuquerque',
+        notes:['Nhổ trại sớm; nghỉ Kanab/Page, Flagstaff, Gallup.'],
+        places:[] },
+    ]
+  },
+
+  // ────────────────────────────────────────────────────────────
+  {
+    title: 'Phương án 2: Flagstaff – Sedona, Arizona',
+    meta:  'Tối ưu 4 ngày 3 đêm. Flagstaff mát, Sedona đẹp nhưng nóng và đông; đi Sedona sáng sớm.',
+    dst:   'Dairy Springs Campground, Flagstaff, AZ',
+    wp:    'Gallup, NM|Winslow, AZ|Sedona, AZ',
+    mapQ:  'Dairy Springs Campground Flagstaff AZ',
+    camp:  'Ưu tiên Dairy Springs Group Site A/B; mỗi site ~40 người. Lưu ý nơi này không cho amplified music/PA.',
+    drive: 'Nghỉ Gallup và Winslow. Từ camp đi Sedona sớm để tránh thiếu parking.',
+    days: [
+      { date:'Ngày 1', title:'Đi Flagstaff',
+        notes:['Đến Dairy Springs/Pine Grove trước 16:00 để dựng trại.','Chiều nhẹ: Walnut Canyon hoặc Lake Mary sunset.'],
+        places:[
+          { name:'Walnut Canyon National Monument',
+            cat:'Walnut_Canyon_National_Monument',
+            q:'Walnut Canyon National Monument Arizona cliff dwellings ruins',
+            max:5 },
+          { name:'Rừng Coconino – San Francisco Peaks',
+            q:'San Francisco Peaks Flagstaff Arizona Coconino National Forest mountain',
+            max:5 },
+        ]},
+
+      { date:'Ngày 2', title:'Sedona',
+        notes:['Sáng Cathedral Rock/Bell Rock.','Chiều Slide Rock/Oak Creek Canyon hoặc Chapel of the Holy Cross.'],
+        places:[
+          { name:'Cathedral Rock – Bell Rock, Sedona',
+            q:'Cathedral Rock Sedona Arizona red rock formation butte',
+            max:6 },
+          { name:'Slide Rock – Oak Creek Canyon',
+            cat:'Slide_Rock_State_Park',
+            q:'Slide Rock State Park Oak Creek Canyon Arizona swimming',
+            max:5 },
+        ]},
+
+      { date:'Ngày 3', title:'Volcano + Pueblo history',
+        notes:['Sáng Sunset Crater Lava Flow Trail.','Chiều Wupatki National Monument.'],
+        places:[
+          { name:'Sunset Crater Volcano National Monument',
+            cat:'Sunset_Crater_Volcano_National_Monument',
+            q:'Sunset Crater Volcano lava field Arizona cinder cone',
+            max:6 },
+          { name:'Wupatki National Monument',
+            cat:'Wupatki_National_Monument',
+            q:'Wupatki Pueblo ruins Arizona Sinagua ancient people',
+            max:5 },
+        ]},
+
+      { date:'Ngày 4', title:'Về Albuquerque',
+        notes:['Nhổ trại, ghé downtown Flagstaff ăn sáng.','Có thể dừng Meteor Crater hoặc Petrified Forest nếu về muộn được.'],
+        places:[
+          { name:'Humphreys Peak – San Francisco Peaks',
+            q:'Humphreys Peak San Francisco Peaks Arizona mountain summit',
+            max:5 },
+          { name:'Meteor Crater Arizona',
+            q:'Meteor Crater Barringer Crater Arizona impact site',
+            max:4 },
+        ]},
+    ]
+  },
+
+  // ────────────────────────────────────────────────────────────
+  {
+    title: 'Phương án 3: Cloudcroft, New Mexico',
+    meta:  'Tối ưu 4 ngày 3 đêm. Mát, rừng cao, hợp nhóm lớn; phương án New Mexico đáng cân nhắc nhất nếu đã đi Jemez nhiều.',
+    dst:   'Slide Group Area, Cloudcroft, NM',
+    wp:    'Socorro, NM|Carrizozo, NM|Alamogordo, NM',
+    mapQ:  'Slide Group Area Cloudcroft NM',
+    camp:  'Ưu tiên Slide Group Area gần Cloudcroft, sức chứa ~90 người, có restroom/trash và meadow sinh hoạt. Nếu dùng dispersed, kiểm tra Lincoln NF MVUM và tự lo toilet/nước/rác.',
+    drive: 'Tuyến Albuquerque → Socorro → Carrizozo → Alamogordo → Cloudcroft. Đường lên quanh co; nên đến khi còn sáng.',
+    days: [
+      { date:'Ngày 1', title:'Đi Cloudcroft',
+        notes:['Xuất phát 07:00; ăn trưa Alamogordo; dựng trại chiều.','Tối sinh hoạt khai mạc.'],
+        places:[
+          { name:'Cloudcroft – Lincoln National Forest',
+            q:'Cloudcroft New Mexico mountain village pine forest scenic',
+            max:5 },
+          { name:'Sacramento Mountains',
+            q:'Sacramento Mountains New Mexico forest ponderosa pine mountain landscape',
+            max:4 },
+        ]},
+
+      { date:'Ngày 2', title:'Trestle + Rim Trail',
+        notes:['Sáng Mexican Canyon Trestle/Trestle Recreation Area.','Chiều Rim Trail đoạn ngắn, sinh hoạt nhóm trong meadow.'],
+        places:[
+          { name:'Mexican Canyon Trestle',
+            cat:'Mexican_Canyon_Trestle',
+            q:'Mexican Canyon Trestle wooden railroad bridge Cloudcroft New Mexico historic',
+            max:4 },
+          { name:'Rim Trail – Lincoln National Forest',
+            q:'Lincoln National Forest Cloudcroft Rim Trail hiking forest trees New Mexico',
+            max:5 },
+        ]},
+
+      { date:'Ngày 3', title:'Sunspot + White Sands',
+        notes:['Sáng Sunspot Scenic Byway và viewpoint (Dunn Solar Telescope).','Chiều White Sands National Park; chơi dune/sunset; về camp sau tối.'],
+        places:[
+          { name:'Sunspot Solar Observatory',
+            cat:'Sunspot_Solar_Observatory',
+            q:'Sunspot Solar Observatory Sacramento Peak Dunn telescope New Mexico',
+            max:5 },
+          { name:'White Sands National Park',
+            q:'White Sands National Park dunes gypsum desert New Mexico',
+            max:7 },
+        ]},
+
+      { date:'Ngày 4', title:'Nhổ trại và về',
+        notes:['Sáng nhẹ quanh Cloudcroft hoặc devotion cuối.','Về Albuquerque qua Alamogordo/Carrizozo.'],
+        places:[
+          { name:'Rừng Cloudcroft – Otero County',
+            q:'Cloudcroft forest trees morning New Mexico Otero County scenic',
+            max:4 },
+        ]},
+    ]
+  },
+
+  // ────────────────────────────────────────────────────────────
+  {
+    title: 'Phương án 4: Jemez – Valles Caldera – Bandelier, New Mexico',
+    meta:  'Tối ưu 3 ngày 2 đêm. Gần, tiết kiệm, đẹp; xếp #4 vì hội thánh đã quen khu Jemez.',
+    dst:   'Jemez Falls Campground, NM',
+    wp:    'Jemez Springs, NM|Valles Caldera National Preserve|Bandelier National Monument',
+    mapQ:  'Jemez Falls Campground New Mexico',
+    camp:  'Jemez Falls Campground có vault toilets khi mở; primitive camping trong Santa Fe NF linh hoạt hơn về âm thanh nhưng cần MVUM và tự lo vệ sinh.',
+    drive: 'Albuquerque → San Ysidro → Jemez Springs → Jemez Falls. NM-4 đẹp nhưng quanh co; tránh đến sau tối.',
+    days: [
+      { date:'Ngày 1', title:'Jemez Falls',
+        notes:['Ghé Jemez Historic Site/Jemez Springs rồi vào camp.','Chiều Jemez Falls trail, tối khai mạc.'],
+        places:[
+          { name:'Jemez Falls',
+            cat:'Jemez_Falls',
+            q:'Jemez Falls waterfall New Mexico cascade canyon',
+            max:5 },
+          { name:'Jemez Mountains – Las Conchas',
+            q:'Jemez Mountains Las Conchas creek canyon meadow New Mexico Santa Fe National Forest',
+            max:4 },
+        ]},
+
+      { date:'Ngày 2', title:'Valles Caldera + Bandelier',
+        notes:['Sáng Valles Caldera, Volcano Discovery Center, Valle Grande.','Chiều Bandelier Main Pueblo Loop/Tyuonyi; có thể thêm Alcove House.'],
+        places:[
+          { name:'Valles Caldera National Preserve',
+            cat:'Valles_Caldera_National_Preserve',
+            q:'Valles Caldera National Preserve New Mexico volcano meadow caldera',
+            max:6 },
+          { name:'Bandelier National Monument',
+            cat:'Bandelier_National_Monument',
+            q:'Bandelier National Monument cliff dwellings Tyuonyi pueblo ruins New Mexico',
+            max:5 },
+        ]},
+
+      { date:'Ngày 3', title:'Gilman Tunnels + Về',
+        notes:['Sáng Las Conchas hoặc devotion nhẹ.','Trên đường về dừng Gilman Tunnels / Battleship Rock nếu đường ổn.'],
+        places:[
+          { name:'Gilman Tunnels',
+            cat:'Gilman_Tunnels',
+            q:'Gilman Tunnels New Mexico Jemez River canyon rock cut railroad',
+            max:4 },
+          { name:'Battleship Rock – Jemez Springs',
+            q:'Battleship Rock New Mexico Jemez volcanic rock formation monolith',
+            max:4 },
+        ]},
+    ]
+  }
+];
+
+// ════════════════════════════════════════════════════════════════
+//  Render plans
+// ════════════════════════════════════════════════════════════════
+const galJobs = []; // { id, def } – queue of galleries to load
+
+function mkRoute(dst, wp) {
+  return 'https://www.google.com/maps/dir/?api=1'
+    + '&origin=Albuquerque%2C%20NM'
+    + '&destination=' + encodeURIComponent(dst)
+    + (wp ? '&waypoints=' + encodeURIComponent(wp) : '')
+    + '&travelmode=driving';
+}
+
+function renderPlan(p, pi) {
+  const daysHtml = p.days.map((d, di) => {
+    const attrHtml = d.places.map((pl, pli) => {
+      const gid = `g${pi}_${di}_${pli}`;
+      galJobs.push({ id: gid, def: pl });
+      return `<div class="place">
+        <h4>${pl.name}</h4>
+        <div class="gallery" id="${gid}">
+          <div class="gal-spin">Đang tải ảnh từ Wikimedia Commons…</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="day">
+      <div class="date">${d.date}</div>
+      <div>
+        <strong>${d.title}</strong>
+        <ul>${d.notes.map(n => `<li>${n}</li>`).join('')}</ul>
+        ${attrHtml ? `<div class="attractions">${attrHtml}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const mapSrc    = `https://www.google.com/maps?q=${encodeURIComponent(p.mapQ)}&output=embed`;
+  const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.mapQ)}`;
+
+  return `<details ${pi === 0 ? 'open' : ''}>
+  <summary>
+    <div><h2>${p.title}</h2><p class="meta">${p.meta}</p></div>
+    <div class="caret">+</div>
+  </summary>
+  <div class="content">
+    <div class="two-col">
+      <div class="box"><h3>Cắm trại</h3><p>${p.camp}</p></div>
+      <div class="box"><h3>Lái xe</h3><p>${p.drive}</p></div>
+    </div>
+    <div class="routebar">
+      <div class="box route-links">
+        <h3>Google Maps</h3>
+        <a href="${mkRoute(p.dst, p.wp)}" target="_blank" rel="noopener">Mở tuyến đường từ Albuquerque</a>
+        <a href="${searchUrl}" target="_blank" rel="noopener">Mở địa điểm camp</a>
+      </div>
+      <iframe class="map-frame" loading="lazy" src="${mapSrc}"></iframe>
+    </div>
+    <h3>Lịch trình theo ngày</h3>
+    ${daysHtml}
+  </div>
+</details>`;
+}
+
+document.getElementById('plans').innerHTML = plans.map(renderPlan).join('');
+
+// ════════════════════════════════════════════════════════════════
+//  Load all gallery images in parallel (fire and forget per gallery)
+// ════════════════════════════════════════════════════════════════
+function renderImages(el, imgs) {
+  if (!imgs.length) {
+    el.innerHTML = '<div class="gal-empty">Không tìm thấy ảnh cho địa điểm này trên Wikimedia Commons.</div>';
+    return;
+  }
+  el.innerHTML = imgs.map(img =>
+    `<figure>
+      <img loading="lazy" src="${img.src}" alt="${img.cap}">
+      <figcaption>${img.cap}</figcaption>
+    </figure>`
+  ).join('');
+}
+
+// Fire all fetches simultaneously; each gallery updates independently as data arrives
+galJobs.forEach(({ id, def }) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  loadImages(def).then(imgs => renderImages(el, imgs)).catch(() => {
+    el.innerHTML = '<div class="gal-empty">Lỗi kết nối khi tải ảnh.</div>';
+  });
+});
+</script>
+</body>
+</html>
