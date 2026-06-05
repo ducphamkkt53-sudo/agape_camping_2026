@@ -576,15 +576,19 @@ galJobs.forEach(({id, def})=>{
 //  5. Paste config vào FIREBASE_CONFIG bên dưới
 //  6. git add . && git commit -m "Add voting" && git push
 // ═══════════════════════════════════════════════════════════════════
-const firebaseConfig = {
-  apiKey: "AIzaSyBPLjUvyVjg5ls5nVEgWykZH4qHqzNNozk",
-  authDomain: "agape-camping.firebaseapp.com",
-  projectId: "agape-camping",
-  storageBucket: "agape-camping.firebasestorage.app",
-  messagingSenderId: "792437660014",
-  appId: "1:792437660014:web:a45835d6dd81d25251c97f"
+// ══ Đã điền config Firebase ═══════════════════════════════════════
+//    databaseURL = https://[projectId]-default-rtdb.firebaseio.com
+// ══════════════════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey:            'AIzaSyBPLjUvyVjg5ls5nVEgWykZH4qHqzNNozk',
+  authDomain:        'agape-camping.firebaseapp.com',
+  databaseURL:       'https://agape-camping-default-rtdb.firebaseio.com',
+  projectId:         'agape-camping',
+  storageBucket:     'agape-camping.firebasestorage.app',
+  messagingSenderId: '792437660014',
+  appId:             '1:792437660014:web:a45835d6dd81d25251c97f'
 };
-// ═══════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
 
 const VOTE_PLANS = [
   { key:'zion',        emoji:'🏔️', name:'Zion National Park',          sub:'Utah · 5 ngày 4 đêm · xa nhất' },
@@ -598,7 +602,8 @@ let myVote = localStorage.getItem(VOTE_LS_KEY);
 let voteDb  = null;
 
 function voteIsConfigured(){
-  return FIREBASE_CONFIG.databaseURL && !FIREBASE_CONFIG.databaseURL.includes('YOUR_');
+  // Check apiKey (always present when configured, unlike databaseURL)
+  return FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.includes('YOUR_');
 }
 
 function buildVoteGrid(){
