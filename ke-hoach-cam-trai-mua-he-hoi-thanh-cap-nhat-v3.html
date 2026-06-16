@@ -288,6 +288,27 @@
       summary{grid-template-columns:1fr}
       .caret{justify-self:start}
     }
+
+    /* -- Audit panel ------------------------------------------- */
+    #audit-panel{
+      background:#0d1f17;color:#c8e6c9;
+      border-radius:10px;padding:24px;
+      margin:0 7vw 32px;font-family:monospace;font-size:.83rem
+    }
+    #audit-panel h2{color:#81c784;margin:0 0 4px;font-family:inherit}
+    #audit-panel p{color:#a5d6a7;margin:0 0 16px;font-size:.8rem}
+    .audit-table{width:100%;border-collapse:collapse}
+    .audit-table th{background:#1b3a25;color:#80cbc4;padding:7px 9px;
+                    text-align:left;font-size:.78rem;border-bottom:1px solid #2e5c38}
+    .audit-table td{padding:6px 9px;border-bottom:1px solid #1a3020;
+                    vertical-align:top;word-break:break-all}
+    .audit-table tr.dup-flag td{background:rgba(255,80,80,.12);color:#ff8a80}
+    .audit-table tr:hover td{background:rgba(255,255,255,.04)}
+    .audit-sum{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px}
+    .audit-box{background:#1b3a25;border-radius:7px;padding:10px 14px;
+               min-width:100px;text-align:center}
+    .audit-box strong{display:block;font-size:1.4rem;color:#a5d6a7}
+    .audit-box span{font-size:.75rem;color:#6a9e72}
   </style>
 </head>
 <body>
@@ -390,6 +411,27 @@
   </section>
 
 </div>
+
+<!-- ============= AUDIT PANEL (URL: ?audit=1) ============= -->
+<div id="audit-panel" style="display:none">
+  <h2>&#x1F50D; Vote Audit Log</h2>
+  <p>Chi hien khi URL co <code style="background:#1b3a25;padding:1px 5px;border-radius:3px">?audit=1</code>
+     &nbsp;&middot;&nbsp; Moi dong = 1 phieu thuc te
+     &nbsp;&middot;&nbsp; <span style="color:#ff8a80">&#9888;&#65039; Do do = fingerprint trung (nghi ngo vote nhieu lan)</span></p>
+  <div id="audit-sum" class="audit-sum"></div>
+  <br>
+  <div style="overflow-x:auto">
+    <table class="audit-table">
+      <thead><tr>
+        <th>#</th><th>Thoi gian</th><th>Phuong an</th>
+        <th>Fingerprint (14 ky tu)</th><th>Man hinh</th><th>Ngon ngu</th><th>Browser</th>
+      </tr></thead>
+      <tbody id="audit-tbody"><tr><td colspan="7">Dang tai...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+<!-- ================================================= -->
+
 <footer>
   <p>
     <strong>Ảnh:</strong> Wikimedia Commons (CC-BY / CC-BY-SA) &amp; Flickr (CC).
@@ -758,29 +800,110 @@ function applyVoteCounts(data){
   });
 }
 
-function castVote(planKey){
-  if(myVote || !voteDb) return;
-  // Atomic increment (safe for concurrent votes)
-  voteDb.ref(`votes_2026/${planKey}`).transaction(v=>(v||0)+1);
-  // Lock locally
-  myVote = planKey;
-  localStorage.setItem(VOTE_LS_KEY, planKey);
-  // Update UI immediately
+// ── Browser fingerprint ──────────────────────────────────────────
+function getBrowserFp(){
+  // Canvas rendering fingerprint (most unique signal)
+  let cvs = '';
+  try{
+    const c = document.createElement('canvas');
+    c.width=200; c.height=40;
+    const x = c.getContext('2d');
+    x.fillStyle='#1a3a4f'; x.fillRect(0,0,200,40);
+    x.fillStyle='#fff'; x.font='bold 16px Arial';
+    x.fillText('Agape Camp 2026 🏕️', 4, 26);
+    cvs = c.toDataURL().slice(-24);
+  } catch(e){}
+
+  const parts = [
+    navigator.userAgent   || '',
+    navigator.language    || '',
+    navigator.platform    || '',
+    (navigator.hardwareConcurrency || 0),
+    (navigator.deviceMemory || 0),
+    screen.width + 'x' + screen.height,
+    screen.colorDepth,
+    new Date().getTimezoneOffset(),
+    cvs
+  ].join('§');
+
+  // djb2 hash → base-36 string
+  let h = 5381;
+  for(let i=0; i < parts.length; i++){
+    h = ((h << 5) + h) ^ parts.charCodeAt(i);
+    h = h >>> 0;
+  }
+  // Second pass for more bits
+  let h2 = 0x811c9dc5;
+  for(let i=0; i < parts.length; i++){
+    h2 ^= parts.charCodeAt(i);
+    h2 = (h2 * 0x01000193) >>> 0;
+  }
+  return h.toString(36).padStart(7,'0') + h2.toString(36).padStart(7,'0');
+}
+
+// ── Lock vote UI after voting ─────────────────────────────────
+function lockVoteUI(planKey){
   VOTE_PLANS.forEach(p=>{
     const btn  = document.getElementById(`vbtn-${p.key}`);
     const card = document.getElementById(`vc-${p.key}`);
-    if(btn)  { btn.disabled=true; }
-    if(card) { card.classList.add('vcard--done'); }
-    if(p.key===planKey){
-      if(btn)  { btn.textContent='✓ Đã bình chọn'; btn.classList.add('vbtn--my'); }
-      if(card) { card.classList.add('vcard--voted'); }
+    if(btn)  btn.disabled = true;
+    if(card) card.classList.add('vcard--done');
+    if(p.key === planKey){
+      if(btn)  { btn.textContent = '✓ Đã bình chọn'; btn.classList.add('vbtn--my'); }
+      if(card) card.classList.add('vcard--voted');
     }
   });
-  // Gentle scroll to voted card
   const el = document.getElementById(`vc-${planKey}`);
-  if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  if(el) el.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
+// ── Cast vote with fingerprint check ───────────────────────────
+function castVote(planKey){
+  if(myVote || !voteDb) return;
+  const fp = getBrowserFp();
+
+  // Check Firebase first: has this fingerprint voted?
+  voteDb.ref(`voted_fps_2026/${fp}`).once('value')
+    .then(snap => {
+      if(snap.exists()){
+        // Already voted from this browser - sync state
+        const prev = snap.val().plan || planKey;
+        myVote = prev;
+        localStorage.setItem(VOTE_LS_KEY, prev);
+        lockVoteUI(prev);
+        return;
+      }
+
+      // New vote: write fingerprint lock + audit log + increment counter
+      const ts = Date.now();
+      voteDb.ref(`voted_fps_2026/${fp}`)
+        .set({ plan: planKey, ts })
+        .then(() => {
+          // Atomic counter increment
+          voteDb.ref(`votes_2026/${planKey}`).transaction(v => (v||0)+1);
+          // Audit trail
+          voteDb.ref('vote_log_2026').push({
+            plan : planKey,
+            ts   : ts,
+            fp   : fp,                                    // full fp for dedup check
+            fpShort: fp.slice(0,6) + '…',               // display only
+            ua   : (navigator.userAgent||'').slice(0,100),
+            lang : navigator.language || '',
+            scr  : screen.width + 'x' + screen.height,
+          });
+          myVote = planKey;
+          localStorage.setItem(VOTE_LS_KEY, planKey);
+          lockVoteUI(planKey);
+        })
+        .catch(() => {
+          // Firebase rule blocked write = already voted
+          voteDb.ref(`voted_fps_2026/${fp}`).once('value')
+            .then(s => { if(s.exists()){ myVote=s.val().plan; lockVoteUI(myVote); } });
+        });
+    });
+}
+
+// ── Init voting ───────────────────────────────────────────────
 function initVoting(){
   const grid   = document.getElementById('vote-grid');
   const notice = document.getElementById('vote-setup-notice');
@@ -790,7 +913,6 @@ function initVoting(){
 
   if(!voteIsConfigured()){
     if(notice) notice.style.display='block';
-    // Show zeros, voting disabled (buttons already disabled without Firebase)
     VOTE_PLANS.forEach(p=>{
       const n=document.getElementById(`vn-${p.key}`);
       if(n) n.textContent='?';
@@ -798,17 +920,27 @@ function initVoting(){
     return;
   }
 
-  // Init Firebase
   if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
   voteDb = firebase.database();
 
-  // Real-time listener
-  voteDb.ref('votes_2026').on('value', snap=>{
-    applyVoteCounts(snap.val()||{});
-  });
+  // Real-time vote counts
+  voteDb.ref('votes_2026').on('value', snap=>{ applyVoteCounts(snap.val()||{}); });
+
+  // On load: check fingerprint in Firebase (catches cleared-localStorage bypass)
+  const fp = getBrowserFp();
+  if(!myVote){
+    voteDb.ref(`voted_fps_2026/${fp}`).once('value').then(snap=>{
+      if(snap.exists()){
+        myVote = snap.val().plan;
+        localStorage.setItem(VOTE_LS_KEY, myVote);
+        lockVoteUI(myVote);
+      }
+    });
+  }
 }
 
 initVoting();
+
 
 // ═══════════════════════════════════════════════════════════════════
 //  COMMENTS / FEEDBACK  –  Firebase Realtime Database
@@ -1000,6 +1132,83 @@ const HERO_SLIDES = [
     preload(nextNext.src);
   }, 5000);
 })();
+
+// =================================================================
+//  AUDIT PANEL  --  URL param: ?audit=1  (admin only)
+// =================================================================
+if(new URLSearchParams(location.search).get('audit') === '1'){
+  const panel = document.getElementById('audit-panel');
+  if(panel) panel.style.display = 'block';
+
+  const PNAME = {
+    zion:'&#x1F3D4;&#xFE0F; Zion', flagstaff:'&#x1F332; Flagstaff',
+    cloudcroft:'&#x26FA; Cloudcroft', jemez:'&#x1F3DE;&#xFE0F; Jemez'
+  };
+
+  function renderAuditPanel(){
+    if(!voteDb){ setTimeout(renderAuditPanel, 800); return; }
+
+    voteDb.ref('vote_log_2026').orderByChild('ts').once('value', snap=>{
+      const rows = [];
+      snap.forEach(ch => rows.push(Object.assign({}, ch.val())));
+      rows.reverse();
+
+      // Count duplicate fingerprints
+      const fpCount = {};
+      rows.forEach(r => { if(r.fp) fpCount[r.fp] = (fpCount[r.fp]||0)+1; });
+      const dupRows = rows.filter(r => r.fp && fpCount[r.fp] > 1);
+
+      // Plan counts
+      const cnts = {};
+      rows.forEach(r => cnts[r.plan] = (cnts[r.plan]||0)+1);
+
+      // Summary
+      const sumEl = document.getElementById('audit-sum');
+      if(sumEl){
+        const warn = dupRows.length
+          ? '<div class="audit-box" style="border:1px solid #ff5252">'
+            + '<strong style="color:#ff8a80">'+dupRows.length+'</strong>'
+            + '<span style="color:#ff8a80">&#9888; Nghi ngo</span></div>'
+          : '<div class="audit-box"><strong style="color:#81c784">0</strong>'
+            + '<span>Trung fingerprint</span></div>';
+
+        sumEl.innerHTML =
+          '<div class="audit-box"><strong>'+rows.length+'</strong><span>Tong phieu log</span></div>'
+          + warn
+          + VOTE_PLANS.map(p=>
+              '<div class="audit-box"><strong>'+(cnts[p.key]||0)+'</strong>'
+              +'<span>'+p.key+'</span></div>'
+            ).join('');
+      }
+
+      // Table
+      const tbody = document.getElementById('audit-tbody');
+      if(!tbody) return;
+      if(!rows.length){
+        tbody.innerHTML = '<tr><td colspan="7">Chua co phieu nao trong vote_log_2026.'
+          +'<br>Chi ghi phieu sau khi nang cap nay (hom nay).</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map((r,i)=>{
+        const d  = new Date(r.ts||0);
+        const ts = d.toLocaleDateString('vi-VN')+' '+d.toLocaleTimeString('vi-VN');
+        const isDup = r.fp && fpCount[r.fp] > 1;
+        const ua = (r.ua||'').replace('Mozilla/5.0','').replace(/\(.*?\)/,'').trim().slice(0,55);
+        return '<tr class="'+(isDup?'dup-flag':'')+'">'
+          +'<td>'+(i+1)+(isDup?' &#9888;&#65039;':'')+'</td>'
+          +'<td>'+ts+'</td>'
+          +'<td>'+(PNAME[r.plan]||r.plan||'?')+'</td>'
+          +'<td style="font-size:.72rem">'+(r.fp||r.fpShort||'-')+'</td>'
+          +'<td>'+(r.scr||'-')+'</td>'
+          +'<td>'+(r.lang||'-')+'</td>'
+          +'<td style="font-size:.72rem">'+ua+'</td>'
+          +'</tr>';
+      }).join('');
+    });
+  }
+
+  setTimeout(renderAuditPanel, 1200);
+}
 
 </script>
 </body>
